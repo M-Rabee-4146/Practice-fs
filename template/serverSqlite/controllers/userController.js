@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const { db } = require("../db");
 const sendMail = require("../utils/mailer");
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../middleware/authMiddleware');
 
 // Get all users
 exports.getAllUsers = (req, res) => {
@@ -56,7 +55,7 @@ exports.userSignup = (req, res) => {
 
   db.run(
     "INSERT INTO users (email, password_hash, role, is_verified) VALUES (?, ?, ?, ?)",
-    [email, hash, role || "cashier", 1], // mark as verified directly
+    [email, hash, role || "user", 1], // mark as verified directly
     function (err) {
       if (err) return res.status(403).json({ message: "User already exists", error: err.message });
 
@@ -66,7 +65,7 @@ exports.userSignup = (req, res) => {
         // Sign token
         const token = jwt.sign(
           { id: row.id, email: row.email, role: row.role },
-          JWT_SECRET,
+          process.env.JWT_SECRET,
           { expiresIn: '24h' }
         );
 
@@ -100,7 +99,7 @@ exports.userLogin = (req, res) => {
     // Sign token
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      JWT_SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 

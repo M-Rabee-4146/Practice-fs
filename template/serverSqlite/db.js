@@ -29,7 +29,7 @@ db.serialize(() => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    role TEXT DEFAULT 'cashier',
+    role TEXT DEFAULT 'user',
     is_verified INTEGER DEFAULT 1,
     status TEXT DEFAULT 'active',
     reset_token TEXT,

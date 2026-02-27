@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_key_change_this_in_prod';
-
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ message: 'No token provided' });
@@ -9,7 +7,7 @@ const verifyToken = (req, res, next) => {
     const token = authHeader.split(' ')[1]; // Bearer <token>
     if (!token) return res.status(401).json({ message: 'Malformed token' });
 
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(401).json({ message: 'Invalid or expired token', error: err.message });
         req.user = decoded; // { id, email, role, ... }
         next();
@@ -44,4 +42,4 @@ const checkIfFirstUser = (req, res, next) => {
     });
 };
 
-module.exports = { verifyToken, JWT_SECRET, restrictTo, checkIfFirstUser };
+module.exports = { verifyToken, restrictTo, checkIfFirstUser };

@@ -1,5 +1,7 @@
 import fsExtra from "fs-extra/esm";
 import inquirer from "inquirer";
+import { BackendOnly } from "./Configuration/BackendOnly.js";
+import {execSync} from "child_process";
 
 const practice = async () => {
     try {
@@ -10,32 +12,38 @@ const practice = async () => {
             name: 'ProjectName',
             message: 'Write the Name of main Folder'
 
-        },{
-            type:'rawlist',
-            name:'FrontendBackend',
-            message:'What you want to create ?',
-            choices:[
-                'Frontend','Backend','Both'
+        }, {
+            type: 'rawlist',
+            name: 'FrontendBackend',
+            message: 'What you want to create ?',
+            choices: [
+                'Frontend', 'Backend', 'Both'
             ]
+        }, {
+            type: 'rawlist',
+            name: 'BackendType',
+            message: 'Which Backend Template you want to use?',
+            choices: [
+                'MongoDB', 'Sqlite'
+            ],
+            when: (answers) => answers.FrontendBackend !== 'Frontend' 
         }
-    ]);
+        ]);
 
         const newPath = `./output/${answer.ProjectName}`;
-        
-        await fsExtra.ensureDir(newPath);
 
+        await fsExtra.ensureDir(newPath);
         // await fsExtra.copy('./template/dbTemp.js', `${newPath}/New.js`);
 
 
-        if(answer.FrontendBackend=='Both'){
+        if (answer.FrontendBackend == 'Both') {
             await fsExtra.ensureDir(`${newPath}/Frontend`);
-            await fsExtra.ensureDir(`${newPath}/Backend`);
+            BackendOnly(newPath,answer.BackendType);
 
-        }else if(answer.FrontendBackend=='Frontend'){
+        } else if (answer.FrontendBackend == 'Frontend') {
             await fsExtra.ensureDir(`${newPath}/Frontend`);
-        }else{
-            await fsExtra.ensureDir(`${newPath}/Backend`);
-            await fsExtra.copy('./template/server',`${newPath}/Backend`);
+        } else {
+            BackendOnly(newPath,answer.BackendType);
         }
 
         console.log("projects Created Successfully")
